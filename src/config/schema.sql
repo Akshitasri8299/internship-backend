@@ -1,16 +1,22 @@
--- ============================================================
--- Internship & Recruitment Management Backend - Database Schema
--- PostgreSQL
--- ============================================================
+DO $$ BEGIN
+  CREATE TYPE user_role AS ENUM ('candidate', 'recruiter', 'admin');
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
 
-CREATE TYPE user_role AS ENUM ('candidate', 'recruiter', 'admin');
-CREATE TYPE internship_status AS ENUM ('open', 'closed', 'draft');
-CREATE TYPE application_status AS ENUM ('Applied', 'Shortlisted', 'Interview Scheduled', 'Rejected', 'Selected');
+DO $$ BEGIN
+  CREATE TYPE internship_status AS ENUM ('open', 'closed', 'draft');
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
+
+DO $$ BEGIN
+  CREATE TYPE application_status AS ENUM ('Applied', 'Shortlisted', 'Interview Scheduled', 'Rejected', 'Selected');
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
 
 -- ============================================================
 -- USERS TABLE
 -- ============================================================
-CREATE TABLE users (
+CREATE TABLE IF NOT EXISTS users (
     id SERIAL PRIMARY KEY,
     name VARCHAR(150) NOT NULL,
     email VARCHAR(150) UNIQUE NOT NULL,
@@ -24,7 +30,7 @@ CREATE TABLE users (
 -- ============================================================
 -- INTERNSHIPS TABLE
 -- ============================================================
-CREATE TABLE internships (
+CREATE TABLE IF NOT EXISTS internships (
     id SERIAL PRIMARY KEY,
     recruiter_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     title VARCHAR(200) NOT NULL,
@@ -38,14 +44,14 @@ CREATE TABLE internships (
     updated_at TIMESTAMP DEFAULT NOW()
 );
 
-CREATE INDEX idx_internships_location ON internships(location);
-CREATE INDEX idx_internships_status ON internships(status);
-CREATE INDEX idx_internships_skills ON internships USING GIN(skills_required);
+CREATE INDEX IF NOT EXISTS idx_internships_location ON internships(location);
+CREATE INDEX IF NOT EXISTS idx_internships_status ON internships(status);
+CREATE INDEX IF NOT EXISTS idx_internships_skills ON internships USING GIN(skills_required);
 
 -- ============================================================
 -- APPLICATIONS TABLE
 -- ============================================================
-CREATE TABLE applications (
+CREATE TABLE IF NOT EXISTS applications (
     id SERIAL PRIMARY KEY,
     internship_id INTEGER NOT NULL REFERENCES internships(id) ON DELETE CASCADE,
     candidate_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
@@ -56,9 +62,9 @@ CREATE TABLE applications (
     UNIQUE(internship_id, candidate_id)
 );
 
-CREATE INDEX idx_applications_candidate ON applications(candidate_id);
-CREATE INDEX idx_applications_internship ON applications(internship_id);
-CREATE INDEX idx_applications_status ON applications(status);
+CREATE INDEX IF NOT EXISTS idx_applications_candidate ON applications(candidate_id);
+CREATE INDEX IF NOT EXISTS idx_applications_internship ON applications(internship_id);
+CREATE INDEX IF NOT EXISTS idx_applications_status ON applications(status);
 
 -- ============================================================
 -- TRIGGER: auto-update updated_at columns
@@ -71,14 +77,23 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE TRIGGER set_timestamp_users
-BEFORE UPDATE ON users
-FOR EACH ROW EXECUTE FUNCTION trigger_set_timestamp();
+DO $$ BEGIN
+  CREATE TRIGGER set_timestamp_users
+  BEFORE UPDATE ON users
+  FOR EACH ROW EXECUTE FUNCTION trigger_set_timestamp();
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
 
-CREATE TRIGGER set_timestamp_internships
-BEFORE UPDATE ON internships
-FOR EACH ROW EXECUTE FUNCTION trigger_set_timestamp();
+DO $$ BEGIN
+  CREATE TRIGGER set_timestamp_internships
+  BEFORE UPDATE ON internships
+  FOR EACH ROW EXECUTE FUNCTION trigger_set_timestamp();
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
 
-CREATE TRIGGER set_timestamp_applications
-BEFORE UPDATE ON applications
-FOR EACH ROW EXECUTE FUNCTION trigger_set_timestamp();
+DO $$ BEGIN
+  CREATE TRIGGER set_timestamp_applications
+  BEFORE UPDATE ON applications
+  FOR EACH ROW EXECUTE FUNCTION trigger_set_timestamp();
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
