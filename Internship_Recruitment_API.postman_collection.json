@@ -1,0 +1,209 @@
+{
+  "info": {
+    "name": "Internship & Recruitment Management API",
+    "_postman_id": "b1e2f3a4-1234-5678-9abc-internshipapi",
+    "description": "Collection for the Internship & Recruitment Management Backend System",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:5000/api" },
+    { "key": "token", "value": "" },
+    { "key": "recruiterToken", "value": "" },
+    { "key": "candidateToken", "value": "" },
+    { "key": "adminToken", "value": "" },
+    { "key": "internshipId", "value": "1" },
+    { "key": "applicationId", "value": "1" }
+  ],
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Register Candidate",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/auth/register",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Asha Candidate\",\n  \"email\": \"asha@example.com\",\n  \"password\": \"Password123\",\n  \"role\": \"candidate\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Register Recruiter",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/auth/register",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Rahul Recruiter\",\n  \"email\": \"rahul@example.com\",\n  \"password\": \"Password123\",\n  \"role\": \"recruiter\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Register Admin",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/auth/register",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Admin User\",\n  \"email\": \"admin@example.com\",\n  \"password\": \"Password123\",\n  \"role\": \"admin\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/auth/login",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"asha@example.com\",\n  \"password\": \"Password123\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Get Profile",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": "{{baseUrl}}/profile"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Internships",
+      "item": [
+        {
+          "name": "Create Internship",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{recruiterToken}}" }
+            ],
+            "url": "{{baseUrl}}/internships",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Backend Developer Intern\",\n  \"description\": \"Work on Node.js and PostgreSQL based REST APIs.\",\n  \"stipend\": 15000,\n  \"location\": \"Remote\",\n  \"skills_required\": [\"nodejs\", \"postgresql\", \"express\"],\n  \"deadline\": \"2026-08-30\",\n  \"status\": \"open\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Get All Internships",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/internships?location=remote&skills=nodejs&status=open&page=1&limit=10&sortBy=created_at&order=desc"
+          }
+        },
+        {
+          "name": "Get Internship By ID",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/internships/{{internshipId}}"
+          }
+        },
+        {
+          "name": "Update Internship",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{recruiterToken}}" }
+            ],
+            "url": "{{baseUrl}}/internships/{{internshipId}}",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"stipend\": 18000,\n  \"status\": \"open\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Delete Internship",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{recruiterToken}}" }],
+            "url": "{{baseUrl}}/internships/{{internshipId}}"
+          }
+        },
+        {
+          "name": "Get Applicants for Internship",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{recruiterToken}}" }],
+            "url": "{{baseUrl}}/internships/{{internshipId}}/applicants?page=1&limit=10"
+          }
+        },
+        {
+          "name": "Apply to Internship",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{candidateToken}}" }
+            ],
+            "url": "{{baseUrl}}/internships/{{internshipId}}/apply",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"resume_url\": \"https://example.com/resumes/asha.pdf\"\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Applications",
+      "item": [
+        {
+          "name": "Get My Applications",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{candidateToken}}" }],
+            "url": "{{baseUrl}}/applications/me?page=1&limit=10"
+          }
+        },
+        {
+          "name": "Update Application Status",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{recruiterToken}}" }
+            ],
+            "url": "{{baseUrl}}/applications/{{applicationId}}/status",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"Shortlisted\"\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Dashboard",
+      "item": [
+        {
+          "name": "Recruiter Dashboard",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{recruiterToken}}" }],
+            "url": "{{baseUrl}}/dashboard/recruiter"
+          }
+        },
+        {
+          "name": "Admin Dashboard",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+            "url": "{{baseUrl}}/dashboard/admin"
+          }
+        }
+      ]
+    }
+  ]
+}

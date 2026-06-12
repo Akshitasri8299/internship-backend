@@ -1,0 +1,20 @@
+const { validationResult } = require('express-validator');
+const ApiError = require('../utils/ApiError');
+
+/**
+ * Runs after express-validator chains. If validation errors exist,
+ * throws a structured 400 ApiError with field-level details.
+ */
+const validate = (req, res, next) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    const formatted = errors.array().map((e) => ({
+      field: e.path,
+      message: e.msg
+    }));
+    throw new ApiError(400, 'Validation failed', formatted);
+  }
+  next();
+};
+
+module.exports = validate;
